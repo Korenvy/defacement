@@ -1,0 +1,201 @@
+<!doctype html>
+
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Hacked</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #000;
+      --green: #00ff00;
+      --font-mono: 'Share Tech Mono', monospace;
+      --font-title: 'Orbitron', sans-serif;
+    }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: var(--bg);
+      overflow: hidden;
+      font-family: var(--font-mono);
+    }.black-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  z-index: 1000;
+}
+.big-msg {
+  font-size: 13vw;
+  color: var(--green);
+  opacity: 0;
+  transform: scale(0.82);
+  text-shadow: 0 0 28px #0f0;
+  letter-spacing: 6px;
+}
+.big-msg.show {
+  animation: fadeInScale 2.5s ease forwards, fadeOut 2.5s ease 3.5s forwards;
+}
+@keyframes fadeInScale { to { opacity: 1; transform: scale(1); } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; filter: blur(6px); } }
+
+#matrix {
+  position: fixed;
+  inset: 0;
+  background: black;
+  z-index: 1;
+  opacity: 0;
+}
+#matrix.reveal { animation: matrixIn 2.5s ease forwards; }
+@keyframes matrixIn { to { opacity: 1; } }
+
+.final-wrap {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 100;
+  color: var(--green);
+  text-align: center;
+  padding: 24px;
+}
+.title {
+  font-family: var(--font-title);
+  font-size: 5.2vw;
+  text-shadow: 0 0 20px #0f0;
+  letter-spacing: 2px;
+  opacity: 0;
+  animation: titleIn 2.4s ease 0.2s forwards;
+}
+@keyframes titleIn { to { opacity: 1; } }
+
+.tagline {
+  margin-top: 12px;
+  font-size: clamp(14px, 2.1vw, 22px);
+  min-height: 1.6em;
+  text-shadow: 0 0 10px #0f0;
+  display: inline-block;
+  position: relative;
+}
+.cursor {
+  display: inline-block;
+  width: 10px;
+  height: 1.1em;
+  margin-left: 4px;
+  background: #0f0;
+  box-shadow: 0 0 8px #0f0;
+  vertical-align: -2px;
+  animation: blink 0.9s steps(1) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+#overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.96);
+  color: var(--green);
+  font-family: var(--font-mono);
+  font-size: 20px;
+  z-index: 2000;
+  cursor: pointer;
+  user-select: none;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 600px){
+  .title { font-size: 9vw; }
+  .big-msg { font-size: 18vw; }
+}
+
+  </style>
+</head>
+<body>  <div id="overlay">CLICK PARA INICIAR</div>  <div class="black-screen" id="black">
+    <div class="big-msg" id="bigmsg">HACKED</div>
+  </div><canvas id="matrix"></canvas>
+
+  <div class="final-wrap">
+    <div class="title" id="finalTitle">HACKED BY KORENVY</div>
+    <div class="tagline"><span id="typed"></span><span class="cursor" id="cursor"></span></div>
+  </div>  <audio id="bg-audio" preload="auto">
+    <source src="audio.mp3" type="audio/mpeg">
+    <source src="audio.ogg" type="audio/ogg">
+  </audio><script>
+const canvas = document.getElementById('matrix');
+const ctx = canvas.getContext('2d');
+let w = canvas.width = window.innerWidth;
+let h = canvas.height = window.innerHeight;
+const fontSize = 16;
+let columns = Math.floor(w / fontSize);
+let drops = new Array(columns).fill(0);
+
+function resize(){
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+  columns = Math.floor(w / fontSize);
+  drops = new Array(columns).fill(0);
+}
+window.addEventListener('resize', resize);
+
+function matrixLoop(){
+  ctx.fillStyle = 'rgba(0,0,0,0.08)';
+  ctx.fillRect(0,0,w,h);
+  ctx.fillStyle = '#0f0';
+  ctx.font = fontSize + 'px Share Tech Mono, monospace';
+  for(let i=0;i<drops.length;i++){
+    const text = Math.random()>0.9 ? '1':'0';
+    const x = i*fontSize;
+    const y = drops[i]*fontSize;
+    ctx.fillText(text, x, y);
+    if(y>h && Math.random()>0.975) drops[i]=0; else drops[i]++;
+  }
+  requestAnimationFrame(matrixLoop);
+}
+
+const typedEl = document.getElementById('typed');
+const phrase = 'Domados por un pibe de 14 años.';
+function typeText(text, speed=40){
+  typedEl.textContent = '';
+  let i=0;
+  const t = setInterval(()=>{
+    typedEl.textContent += text[i];
+    i++;
+    if(i>=text.length) clearInterval(t);
+  }, speed);
+}
+
+const overlay = document.getElementById('overlay');
+const black = document.getElementById('black');
+const bigmsg = document.getElementById('bigmsg');
+const matrixEl = document.getElementById('matrix');
+const finalTitle = document.getElementById('finalTitle');
+const audioEl = document.getElementById('bg-audio');
+
+function startSequence(){
+  overlay.style.display='none';
+  matrixLoop();
+  matrixEl.classList.add('reveal');
+  setTimeout(()=>bigmsg.classList.add('show'), 200);
+  setTimeout(()=>{ black.style.display='none'; }, 6200);
+  setTimeout(()=>{ finalTitle.style.opacity = 1; typeText(phrase, 40); fadeInAudio(); }, 6800);
+}
+
+function fadeInAudio(){
+  audioEl.volume = 0;
+  audioEl.play().catch(()=>{});
+  let v=0;
+  const step = 0.02;
+  const intv = setInterval(()=>{ v = Math.min(0.7, v+step); audioEl.volume = v; if(v>=0.7) clearInterval(intv); }, 200);
+}
+
+overlay.addEventListener('click', startSequence);
+window.addEventListener('load', ()=>{ resize(); });
+</script></body>
+</html>
